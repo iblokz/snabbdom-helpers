@@ -1,7 +1,7 @@
 'use strict';
 
 const snabbdom = require('snabbdom');
-const h = require('snabbdom/h');
+const h = require('snabbdom/h').default;
 const {obj} = require('iblokz-data');
 
 const supportedTags = [
@@ -14,11 +14,11 @@ const supportedTags = [
 ];
 
 const patch = snabbdom.init([ // Init patch function with choosen modules
-	require('snabbdom/modules/class'), // makes it easy to toggle classes
-	require('snabbdom/modules/props'), // for setting properties on DOM elements
-	require('snabbdom/modules/attributes'), // for setting properties on DOM elements
-	require('snabbdom/modules/style'), // handles styling on elements with support for animations
-	require('snabbdom/modules/eventlisteners') // attaches event listeners
+	require('snabbdom/modules/class').default, // makes it easy to toggle classes
+	require('snabbdom/modules/props').default, // for setting properties on DOM elements
+	require('snabbdom/modules/attributes').default, // for setting properties on DOM elements
+	require('snabbdom/modules/style').default, // handles styling on elements with support for animations
+	require('snabbdom/modules/eventlisteners').default // attaches event listeners
 ]);
 
 const patchStream = (stream, dom) => {
