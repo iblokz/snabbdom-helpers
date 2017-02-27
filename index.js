@@ -2,7 +2,16 @@
 
 const snabbdom = require('snabbdom');
 const h = require('snabbdom/h');
-const obj = require('../common/obj');
+const {obj} = require('iblokz-data');
+
+const supportedTags = [
+	'h1', 'h2', 'h3', 'h4', 'section', 'header', 'article',
+	'div', 'p', 'span', 'pre', 'code', 'a', 'dd', 'dt', 'hr', 'br', 'b', 'i',
+	'table', 'thead', 'tbody', 'th', 'tr', 'td', 'ul', 'ol', 'li',
+	// form related
+	'form', 'fieldset', 'legend', 'input', 'textarea', 'label', 'button', 'select', 'option',
+	'canvas', 'video', 'img'
+];
 
 const patch = snabbdom.init([ // Init patch function with choosen modules
 	require('snabbdom/modules/class'), // makes it easy to toggle classes
@@ -32,8 +41,8 @@ const processAttrs = args => {
 	selector = selector.replace(attrRegExp, '');
 
 	attrs = attrs && attrs.map && attrs
-			.map(c => c.replace(/[\[\]"]/g, '').split('='))
-			.reduce((o, attr) => obj.patch(o, attr[0], attr[1]), {}) || {};
+		.map(c => c.replace(/[[\]"]/g, '').split('='))
+		.reduce((o, attr) => obj.patch(o, attr[0], attr[1]), {}) || {};
 
 	if (attrs && Object.keys(attrs).length > 0) {
 		if (!newArgs[0] || newArgs[0]
@@ -41,34 +50,24 @@ const processAttrs = args => {
 			attrs = Object.assign({}, newArgs[0] && newArgs[0].attrs || {}, attrs);
 			newArgs[0] = Object.assign({}, newArgs[0] || {}, {attrs});
 		} else {
-			newArgs = [{attrs}].concat(
-				newArgs
-			);
+			newArgs = [{attrs}].concat(newArgs);
 		}
 	}
 
-	if (selector !== '')
-		newArgs = [selector].concat(newArgs);
+	if (selector !== '') newArgs = [selector].concat(newArgs);
 
 	// console.log(args, newArgs);
 	return newArgs;
 };
 
-const hyperHelpers = [
-	'h1', 'h2', 'h3', 'h4', 'section', 'header', 'article',
-	'div', 'p', 'span', 'pre', 'code', 'a', 'dd', 'dt', 'hr', 'br', 'b', 'i',
-	'table', 'thead', 'tbody', 'th', 'tr', 'td', 'ul', 'ol', 'li',
-	'form', 'fieldset', 'legend', 'input', 'textarea', 'label', 'button', 'select', 'option',
-	'canvas', 'video', 'img'
-].reduce(
+const hyperHelpers = supportedTags.reduce(
 	(o, tag) => {
 		o[tag] = function() {
-			return [Array.prototype.slice.call(arguments)]
+			return [Array.from(arguments)]
 				.map(processAttrs)
-				.map(
-					args => (
-						args[0] && typeof args[0] === 'string'
-						&& args[0].match(/^(\.|#)[a-zA-Z\-_0-9]+/ig))
+				.map(args => (
+					// is the first argument a selector
+					args[0] && typeof args[0] === 'string' && args[0].match(/^(\.|#)[a-zA-Z\-_0-9]+/ig))
 						? [].concat(tag + args[0], args.slice(1))
 						: [tag].concat(args))
 				.map(args => h.apply(this, args))

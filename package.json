@@ -1,0 +1,45 @@
+{
+  "name": "iblokz-snabbdom-helpers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js",
+    "test": "nyc mocha --colors test/**/*"
+  },
+  "nyc": {
+    "include": [
+      "index.js"
+    ],
+    "exclude": [
+      "node_modules/",
+      "test/"
+    ],
+    "reporter": [
+      "lcov",
+      "text",
+      "html"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iblokz/snabbdom-helpers.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iblokz/snabbdom-helpers/issues"
+  },
+  "homepage": "https://github.com/iblokz/snabbdom-helpers#readme",
+  "dependencies": {
+    "iblokz-data": "^1.0.1",
+    "snabbdom": "^0.6.5"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.3.1",
+    "eslint-config-google": "^0.6.0",
+    "mocha": "^3.2.0",
+    "nyc": "^10.1.2"
+  }
+}
