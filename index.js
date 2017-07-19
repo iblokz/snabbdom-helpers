@@ -3,15 +3,7 @@
 const snabbdom = require('snabbdom');
 const h = require('snabbdom/h').default;
 const {obj} = require('iblokz-data');
-
-const supportedTags = [
-	'h1', 'h2', 'h3', 'h4', 'section', 'header', 'article',
-	'div', 'p', 'span', 'pre', 'code', 'a', 'dd', 'dt', 'hr', 'br', 'b', 'i',
-	'table', 'thead', 'tbody', 'th', 'tr', 'td', 'ul', 'ol', 'li',
-	// form related
-	'form', 'fieldset', 'legend', 'input', 'textarea', 'label', 'button', 'select', 'option',
-	'canvas', 'video', 'img'
-];
+const htmlTags = require('html-tags');
 
 const patch = snabbdom.init([ // Init patch function with choosen modules
 	require('snabbdom/modules/class').default, // makes it easy to toggle classes
@@ -60,7 +52,7 @@ const processAttrs = args => {
 	return newArgs;
 };
 
-const hyperHelpers = supportedTags.reduce(
+const hyperHelpers = htmlTags.reduce(
 	(o, tag) => {
 		o[tag] = function() {
 			return [Array.from(arguments)]
