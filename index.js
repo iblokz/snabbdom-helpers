@@ -5,6 +5,8 @@ const h = require('snabbdom/h').default;
 const {obj} = require('iblokz-data');
 const htmlTags = require('html-tags');
 
+const attrs = require('./util/attrs');
+
 const patch = snabbdom.init([ // Init patch function with choosen modules
 	require('snabbdom/modules/class').default, // makes it easy to toggle classes
 	require('snabbdom/modules/props').default, // for setting properties on DOM elements
@@ -21,42 +23,11 @@ const patchStream = (stream, dom) => {
 	).subscribe();
 };
 
-const processAttrs = args => {
-	let newArgs = args.slice();
-
-	let selector = newArgs[0] && typeof newArgs[0] === 'string' && newArgs[0] || '';
-	if (selector !== '') newArgs = newArgs.slice(1);
-
-	const attrRegExp = /\[[a-z\-0-9]+="[^"]+"\]/ig;
-
-	let attrs = selector && selector.match(attrRegExp);
-	selector = selector.replace(attrRegExp, '');
-
-	attrs = attrs && attrs.map && attrs
-		.map(c => c.replace(/[[\]"]/g, '').split('='))
-		.reduce((o, attr) => obj.patch(o, attr[0], attr[1]), {}) || {};
-
-	if (attrs && Object.keys(attrs).length > 0) {
-		if (!newArgs[0] || newArgs[0]
-			&& typeof newArgs[0] === 'object' && !(newArgs[0] instanceof Array)) {
-			attrs = Object.assign({}, newArgs[0] && newArgs[0].attrs || {}, attrs);
-			newArgs[0] = Object.assign({}, newArgs[0] || {}, {attrs});
-		} else {
-			newArgs = [{attrs}].concat(newArgs);
-		}
-	}
-
-	if (selector !== '') newArgs = [selector].concat(newArgs);
-
-	// console.log(args, newArgs);
-	return newArgs;
-};
-
 const hyperHelpers = htmlTags.reduce(
 	(o, tag) => {
 		o[tag] = function() {
 			return [Array.from(arguments)]
-				.map(processAttrs)
+				.map(attrs.process)
 				.map(args => (
 					// is the first argument a selector
 					args[0] && typeof args[0] === 'string' && args[0].match(/^(\.|#)[a-zA-Z\-_0-9]+/ig))

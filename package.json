@@ -33,7 +33,7 @@
   "homepage": "https://github.com/iblokz/snabbdom-helpers#readme",
   "dependencies": {
     "html-tags": "^2.0.0",
-    "iblokz-data": "^1.0.1",
+    "iblokz-data": "^1.1.0",
     "snabbdom": "^0.6.5"
   },
   "devDependencies": {
