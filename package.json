@@ -1,25 +1,55 @@
 {
   "name": "iblokz-snabbdom-helpers",
-  "version": "1.2.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "lint": "eslint index.js",
-    "test": "nyc mocha --colors test/**/*"
+  "version": "2.0.0",
+  "description": "Snabbdom virtual DOM helpers with hyperscript syntax sugar",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./dist/index.cjs"
+    }
   },
-  "nyc": {
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "util/",
+    "dist/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
+  ],
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "scripts": {
+    "build": "node build.js",
+    "lint": "eslint *.js util/**/*.js",
+    "test": "c8 mocha --colors --require test/setup.js 'test/**/*.test.js'",
+    "test:watch": "mocha --colors --require test/setup.js --watch 'test/**/*.test.js'",
+    "prepare": "husky",
+    "prepublishOnly": "npm run build && npm test && npm run lint"
+  },
+  "c8": {
     "include": [
-      "index.js"
+      "index.js",
+      "util/**/*.js"
     ],
     "exclude": [
-      "node_modules/",
-      "test/"
+      "test/**",
+      "build.js",
+      "dist/**"
     ],
     "reporter": [
       "lcov",
       "text",
       "html"
-    ]
+    ],
+    "all": true,
+    "check-coverage": false
   },
   "repository": {
     "type": "git",
@@ -32,15 +62,19 @@
   },
   "homepage": "https://github.com/iblokz/snabbdom-helpers#readme",
   "dependencies": {
-    "html-tags": "^2.0.0",
-    "iblokz-data": "^1.1.0",
-    "snabbdom": "^0.6.5"
+    "html-tags": "^5.1.0",
+    "iblokz-data": "^1.6.0",
+    "rxjs": "^7.8.2",
+    "snabbdom": "^3.6.3"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^3.3.1",
-    "eslint-config-google": "^0.6.0",
-    "mocha": "^3.2.0",
-    "nyc": "^10.1.2"
+    "c8": "^10.1.0",
+    "chai": "^4.3.10",
+    "esbuild": "^0.24.0",
+    "eslint": "^8.56.0",
+    "eslint-config-google": "^0.14.0",
+    "husky": "^9.1.7",
+    "jsdom": "^24.0.0",
+    "mocha": "^10.2.0"
   }
 }

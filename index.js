@@ -1,50 +1,84 @@
-'use strict';
+/**
+ * @module iblokz-snabbdom-helpers
+ * @description Snabbdom virtual DOM helpers with hyperscript syntax sugar
+ * @version 2.0.0
+ */
 
-const snabbdom = require('snabbdom');
-const h = require('snabbdom/h').default;
-const {obj} = require('iblokz-data');
-const htmlTags = require('html-tags');
+import {
+	init,
+	h,
+	classModule,
+	propsModule,
+	attributesModule,
+	styleModule,
+	eventListenersModule
+} from 'snabbdom';
+import {scan} from 'rxjs/operators';
+import htmlTags from 'html-tags';
 
-const attrs = require('./util/attrs');
+import * as attrs from './util/attrs.js';
 
-const patch = snabbdom.init([ // Init patch function with choosen modules
-	require('snabbdom/modules/class').default, // makes it easy to toggle classes
-	require('snabbdom/modules/props').default, // for setting properties on DOM elements
-	require('snabbdom/modules/attributes').default, // for setting properties on DOM elements
-	require('snabbdom/modules/style').default, // handles styling on elements with support for animations
-	require('snabbdom/modules/eventlisteners').default // attaches event listeners
+/**
+ * Patch function initialized with standard modules
+ * @type {Function}
+ */
+export const patch = init([
+	classModule, // makes it easy to toggle classes
+	propsModule, // for setting properties on DOM elements
+	attributesModule, // for setting attributes on DOM elements
+	styleModule, // handles styling on elements with support for animations
+	eventListenersModule // attaches event listeners
 ]);
 
-const patchStream = (stream, dom) => {
+/**
+ * Patch an observable stream of vnodes to a DOM element
+ * @param {Observable} stream - Observable stream of vnodes
+ * @param {string|Element} dom - DOM element or selector
+ * @return {Subscription} Stream subscription
+ * @example
+ * const vnode$ = interval(1000).pipe(map(() => h('div', 'Hello')));
+ * patchStream(vnode$, '#app');
+ */
+export const patchStream = (stream, dom) => {
 	dom = (typeof dom === 'string') ? document.querySelector(dom) : dom;
-	stream.scan(
-		(vnode, newVnode) => patch(vnode, newVnode),
-		dom
+	return stream.pipe(
+		scan((vnode, newVnode) => patch(vnode, newVnode), dom)
 	).subscribe();
 };
 
+/**
+ * Generate hyperscript helper functions for all HTML tags
+ */
 const hyperHelpers = htmlTags.reduce(
 	(o, tag) => {
 		o[tag] = function() {
 			return [Array.from(arguments)]
 				.map(attrs.process)
-				.map(args => (
+				.map((args) => (
 					// is the first argument a selector
 					args[0] && typeof args[0] === 'string' && args[0].match(/^(\.|#)[a-zA-Z\-_0-9]+/ig))
-						? [].concat(tag + args[0], args.slice(1))
-						: [tag].concat(args))
-				.map(args => h.apply(this, args))
+					? [].concat(tag + args[0], args.slice(1))
+					: [tag].concat(args))
+				.map((args) => h.apply(this, args))
 				.pop();
 		};
 		return o;
 	}, {}
 );
 
-module.exports = Object.assign(
-	{
-		h,
-		patch,
-		patchStream
-	},
-	hyperHelpers
-);
+// Export h function and patch utilities
+export {h};
+
+// Export all HTML tag helpers
+export const {
+	a, abbr, address, area, article, aside, audio, b, base, bdi, bdo, blockquote,
+	body, br, button, canvas, caption, cite, code, col, colgroup, data, datalist,
+	dd, del, details, dfn, dialog, div, dl, dt, em, embed, fieldset, figcaption,
+	figure, footer, form, h1, h2, h3, h4, h5, h6, head, header, hgroup, hr, html,
+	i, iframe, img, input, ins, kbd, label, legend, li, link, main, map, mark,
+	menu, meta, meter, nav, noscript, object, ol, optgroup, option, output, p,
+	picture, pre, progress, q, rp, rt, ruby, s, samp, script, search, section,
+	select, slot, small, source, span, strong, style, sub, summary, sup, table,
+	tbody, td, template, textarea, tfoot, th, thead, time, title, tr, track, u,
+	ul, video, wbr
+} = hyperHelpers;

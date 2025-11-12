@@ -1,15 +1,30 @@
-'use strict';
+/**
+ * Attribute utilities for snabbdom helpers
+ * @module util/attrs
+ */
 
-const {obj} = require('iblokz-data');
+import {obj} from 'iblokz-data';
 
-const strParse = s =>
+/**
+ * Parse string values to appropriate types
+ * @param {string} s - String to parse
+ * @return {number|boolean|string} Parsed value
+ */
+const strParse = (s) =>
 	s.match(/^[0-9]+$/) ? parseInt(s, 10)
-	: s.match(/^[0-9.]+$/) ? parseFloat(s)
-	: s === 'true' ? true
-	: s === 'false' ? false
-	: s;
+		: s.match(/^[0-9.]+$/) ? parseFloat(s)
+			: s === 'true' ? true
+				: s === 'false' ? false
+					: s;
 
-const process = args => {
+/**
+ * Process hyperscript arguments with attribute selector support
+ * @param {Array} args - Arguments to process
+ * @return {Array} Processed arguments
+ * @example
+ * process(['[name="john"]']) // => [{attrs: {name: 'john'}}]
+ */
+const process = (args) => {
 	let newArgs = args.slice();
 
 	let selector = newArgs[0] && typeof newArgs[0] === 'string' && newArgs[0] || '';
@@ -21,7 +36,7 @@ const process = args => {
 	selector = selector.replace(attrRegExp, '');
 
 	attrs = attrs && attrs.map && attrs
-		.map(c => c.replace(/[[\]("|')]/g, '').split('='))
+		.map((c) => c.replace(/[[\]("|')]/g, '').split('='))
 		.reduce((o, attr) => obj.patch(o, attr[0], strParse(attr[1])), {}) || {};
 
 	if (attrs && Object.keys(attrs).length > 0) {
@@ -36,11 +51,10 @@ const process = args => {
 
 	if (selector !== '') newArgs = [selector].concat(newArgs);
 
-	// console.log(args, newArgs);
 	return newArgs;
 };
 
-module.exports = {
+export {
 	strParse,
 	process
 };

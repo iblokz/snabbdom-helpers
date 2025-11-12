@@ -1,8 +1,6 @@
-'use strict';
+import {expect} from 'chai';
 
-const expect = require('chai').expect;
-
-const attrs = require('../../util/attrs');
+import * as attrs from '../../util/attrs.js';
 
 describe('util/attrs', () => (
 	describe('process', () => (
